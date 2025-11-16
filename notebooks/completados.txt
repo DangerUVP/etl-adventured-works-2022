@@ -1,0 +1,12 @@
+dimensiones completas:
+    currency 
+    Customer
+    Geography
+    ProductCategory
+    ProductSubCategory
+    Product (Falta columna [SizeRange], [DealerPrice], [Status].  Los puse en None)
+    promotion
+    SalesTerritory (Falta la columna de la [imagen]. La puse en None)
+
+Tabla de hechos
+

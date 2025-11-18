@@ -169,7 +169,7 @@ def transformarGeography(tablaAddress: DataFrame,tablaStateProvince: DataFrame,t
         'TerritoryID' : 'SalesTerritoryKey'
     }, inplace=True)
 
-    print(f"Transformacion de dimension Currency Completa")
+    print(f"Transformacion de dimension Geography Completa")
 
     return dimensionGeography
 

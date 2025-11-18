@@ -1,12 +1,4 @@
-#%%
-# import datetime
-# from datetime import timedelta, date, datetime
-# from typing import Tuple, Any
 
-# import holidays
-# import numpy as np
-# from mlxtend.frequent_patterns import apriori
-# from mlxtend.preprocessing import TransactionEncoder
 from pandas import DataFrame
 import pandas as pd
 
@@ -470,8 +462,3 @@ def transformarHechoResellerSales(tablaPurchaseSales:DataFrame) -> DataFrame:
 
     print(f"Transformacion de Hecho Reseller Sales Completa")
     return tablaPurchaseSales
-
-
-
-
-

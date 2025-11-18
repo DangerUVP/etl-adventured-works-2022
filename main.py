@@ -1,14 +1,11 @@
 import pandas as pd
-import datetime
-from datetime import date
-from sqlalchemy import create_engine, inspect, text
-from sqlalchemy.engine import Engine
+from sqlalchemy import create_engine
 import yaml
-#from etl import extract, transform, load
 import psycopg2
 from etl import extract
 from etl import transform
 from etl import load
+from sqlalchemy.engine import URL
 
 
 # PARA DEFINIR EL MAXIMO DE REGISTROS EN FILAS Y COLUMNAS
@@ -24,7 +21,6 @@ with open('configuracion.yml', 'r') as f:
 
 # CREAR LAS URLs DE CONEXION
 
-from sqlalchemy.engine import URL
 
 urlBaseDatos = URL.create(
     "mssql+pyodbc",
@@ -54,7 +50,6 @@ motorBodegaDatos = create_engine(urlBodegaDatos)
 
 
 # CODIGO PARA CARGAR DATOS A LA BODEGA SI HAY NUEVOS
-
 
 def runDimensionCurrency():
     print("Inicio de extraccion de datos para Currency")

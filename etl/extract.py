@@ -3,27 +3,11 @@ from sqlalchemy.engine import Engine
 
 
 
-
-
-# def extract(tables : list,conection: Engine)-> pd.DataFrame:
-#     """
-#     :param conection: the conectionnection to the database
-#     :param tables: the tables to extract
-#     :return: a list of tables in df format
-#     """
-#     a = []
-#     for i in tables:
-#         aux = pd.read_sql_table(i, conection)
-#         a.append(aux)
-#     return a
-
 def extraerDimensionCurrency(conexion: Engine):
     dimensionCurrency = pd.read_sql_table("Currency", conexion, "Sales")
     print(f"Datos para dimension Currency Extraidos")
 
     return dimensionCurrency
-
-
 
 def extraerDimensionSalesTerritory(conexion: Engine):
 
@@ -108,7 +92,6 @@ def extraerDimensionProductSubCategory(conexion: Engine):
     dimensionSubProductCategory = pd.read_sql_table("ProductSubcategory", conexion, "Production")
     print(f"Datos para dimension ProductSubCategory Extraidos")
     return dimensionSubProductCategory
-
 
 def extraerDimensionCustomer(conexion: Engine):
     
@@ -211,7 +194,6 @@ def extraerDimensionCustomer(conexion: Engine):
     print(f"Datos para dimension Customer Extraidos")
 
     return dimensionCustomer
-
 
 def extraerDimensionProduct(conexion: Engine):
 
@@ -331,8 +313,6 @@ def extraerDimensionProduct(conexion: Engine):
 
     return dimensionProducto
 
-
-
 def extraerDatosHechoInternetSales(conexion: Engine):
 
     queryOderDetail = """
@@ -390,9 +370,6 @@ def extraerDatosHechoInternetSales(conexion: Engine):
     print(f"Datos para Hecho Internet Sales Extraidos")
 
     return tablaSales
-
-
-
 
 
 # PARA EL DATAMART DE RESELLER SALES
@@ -697,8 +674,6 @@ def extraerDimensionReseller(conexion: Engine):
     print(f"Datos para dimension Reseller Extraidos")
     return dimensionReseller
 
-
-
 def extraerDatosHechoResellerSales(conexion: Engine,conexionDW: Engine,):
 
 
@@ -781,62 +756,3 @@ def extraerDatosHechoResellerSales(conexion: Engine,conexionDW: Engine,):
 
     print(f"Datos para Hecho Reseller Sales Extraidos")
     return tablaPurchaseSales
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

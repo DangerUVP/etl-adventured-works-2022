@@ -6,6 +6,9 @@ from sqlalchemy.engine import Engine
 import yaml
 #from etl import extract, transform, load
 import psycopg2
+from etl import extract
+from etl import transform
+from etl import load
 
 
 # PARA DEFINIR EL MAXIMO DE REGISTROS EN FILAS Y COLUMNAS
@@ -49,77 +52,117 @@ urlBodegaDatos = URL.create(
 motorBaseDatos = create_engine(urlBaseDatos)
 motorBodegaDatos = create_engine(urlBodegaDatos)
 
-inspector = inspect(motorBodegaDatos)
-nombreTablas = inspector.get_table_names()
-
-
-
-# if not nombreTablas:
-#     conexion = psycopg2.connect(dbname=configuracionBodegaDatos['dbname'], user=configuracionBodegaDatos['user'], password=configuracionBodegaDatos['password'],
-#                             host=configuracionBodegaDatos['host'], port=configuracionBodegaDatos['port'])
-#     cursor = conexion.cursor()
-#     with open('sqlscripts.yml', 'r') as f: #EL ARCHIVO 'sqlscripts.yml' TIENE EL SCRIPT PARA CREAR LAS DIMENIONES Y LOS HECHOS(BODEGA)
-#         sql = yaml.safe_load(f)
-#         for key, val in sql.items():
-#             cursor.execute(val)
-#             conexion.commit()
-
 
 # CODIGO PARA CARGAR DATOS A LA BODEGA SI HAY NUEVOS
-# if utils_etl.new_data(motorBodegaDatos):
-
-#     if configuracion['CARGAR_DIMENSIONES']:
-#         dim_ips = extract.extract_ips(co_sa)
-#         dim_persona = extract.extract_persona(co_sa)
-#         dim_medico = extract.extract_medico(co_sa)
-#         trans_servicio = extract.extract_trans_servicio(co_sa)
-#         dim_demo = extract.extract_demografia(co_sa)
-#         dim_diag = extract.extract_enfermedades(co_sa)
-#         dim_drug = extract.extract_medicamentos(config['medicamentos'])
-#         dim_servicio = extract.extract_servicios(co_sa)
 
 
-#         # transform
-#         dim_ips = transform.transform_ips(dim_ips)
-#         dim_persona = transform.transform_persona(dim_persona)
-#         dim_medico = transform.transform_medico(dim_medico)
-#         trans_servicio = transform.transform_trans_servicio(trans_servicio)
-#         dim_fecha = transform.transform_fecha()
-#         dim_demo = transform.transform_demografia(dim_demo)
-#         dim_diag = transform.transform_enfermedades(dim_diag)
+def runDimensionCurrency():
+    print("Inicio de extraccion de datos para Currency")
+    dimensionCurrency = extract.extraerDimensionCurrency(motorBaseDatos)
+    dimensionCurrencyTransformado = transform.transformarCurrency(dimensionCurrency)
+    load.cargarDatosCurrency(dimensionCurrency,motorBodegaDatos)
+
+
+def runDimensionSalesTerritory():
+    print("Inicio de extraccion de datos para SalesTerritory")
+    tablaSalesTerritory,tablaCountryRegion = extract.extraerDimensionSalesTerritory(motorBaseDatos)
+    dimensionSalesTerritoryTransformado = transform.transformarSalesTerritory(tablaSalesTerritory,tablaCountryRegion)
+    load.cargarDatosSalesTerritory(dimensionSalesTerritoryTransformado,motorBodegaDatos)
+
+
+def runDimensionDate():
+    print("Inicio de extraccion de datos para Date")
+    dimensionDate = extract.extraerDimensionDate()
+    dimensionDateTransformado = transform.transformarDate(dimensionDate)
+    load.cargarDatosDate(dimensionDateTransformado,motorBodegaDatos)
+
+def runDimensionPromotion():
+    print("Inicio de extraccion de datos para Promotion")
+    dimensionPromotion = extract.extraerDimensionPromotion(motorBaseDatos)
+    dimensionPromotionTransformado = transform.transformarPromotion(dimensionPromotion)
+    load.cargarDatosPromotion(dimensionPromotionTransformado,motorBodegaDatos)
+
+def runDimensionGeography():
+    print("Inicio de extraccion de datos para Geography")
+    tablaAddress,tablaStateProvince,tablaCountryRegion = extract.extraerDimensionGeography(motorBaseDatos)
+    dimensionGeographyTransformado = transform.transformarGeography(tablaAddress,tablaStateProvince,tablaCountryRegion)
+    load.cargarDatosGeography(dimensionGeographyTransformado,motorBodegaDatos)
+
+def runDimensionProductCategory():
+    print("Inicio de extraccion de datos para ProductCategory")
+    dimensionProductCategory= extract.extraerDimensionProductCategory(motorBaseDatos)
+    dimensionProductCategoryTransformado = transform.transformarProductCategory(dimensionProductCategory)
+    load.cargarDatosProductCategory(dimensionProductCategoryTransformado,motorBodegaDatos)
+
+def runDimensionProductSubCategory():
+    print("Inicio de extraccion de datos para ProductSubCategory")
+    dimensionProductSubCategory= extract.extraerDimensionProductSubCategory(motorBaseDatos)
+    ProductSubCategoryTransformado = transform.transformarProductSubCategory(dimensionProductSubCategory)
+    load.cargarDatosProductSubCategory(ProductSubCategoryTransformado,motorBodegaDatos)
+
+def runDimensionCustomer():
+    print("Inicio de extraccion de datos para Customer")
+    dimensionCustomer= extract.extraerDimensionCustomer(motorBaseDatos)
+    dimensionCustomerTransformado = transform.transformarCustomer(dimensionCustomer)
+    load.cargarDatosCustomer(dimensionCustomerTransformado,motorBodegaDatos)
 
 
 
-#         load.load(dim_ips, etl_conn, 'dim_ips', True)
-#         load.load(dim_fecha, etl_conn, 'dim_fecha', True)
-#         load.load(dim_servicio, etl_conn, 'dim_servicio', True)
-#         load.load(dim_persona, etl_conn, 'dim_persona', True)
-#         load.load(dim_medico, etl_conn, 'dim_medico', True)
-#         load.load(trans_servicio, etl_conn, 'trans_servicio', True)
-#         load.load(dim_diag, etl_conn, 'dim_diag', True)
-#         load.load(dim_demo, etl_conn, 'dim_demografia', True)
-#         load.load(dim_drug,etl_conn,'dim_medicamentos',True)
+def runDimensionProduct():
+    print("Inicio de extraccion de datos para Prouct")
+    dimensionProduct= extract.extraerDimensionProduct(motorBaseDatos)
+    dimensionProductTransformado = transform.transformarProduct(dimensionProduct)
+    load.cargarDatosProduct(dimensionProductTransformado,motorBodegaDatos)
+
+def runHechoInternetSales():
+    print("Inicio de extraccion de datos para HechoInternetSales")
+    hechoInternetSales= extract.extraerDatosHechoInternetSales(motorBaseDatos)
+    hechoInternetSalesTransformado = transform.transformarHechoInternetSales(hechoInternetSales)
+    load.cargarHechoInternetSales(hechoInternetSalesTransformado,motorBodegaDatos)
 
 
-#     #hecho Atencion
-#     hecho_atencion = extract.extract_hecho_atencion(etl_conn)
-#     hecho_atencion = transform.transform_hecho_atencion(hecho_atencion)
-#     load.load_hecho_atencion(hecho_atencion, etl_conn)
-#     print('Done atencion fact')
-#     # Hecho Entrega medicamentos
-#     hecho_entrega = extract.extract_hecho_entrega(co_sa,etl_conn)
-#     hecho_entrega, masrecetados = transform.transform_hecho_entrega(hecho_entrega)
-#     load.load_hecho_entrega(hecho_entrega, etl_conn)
-#     print('Done entrega fact')
-#     # medicamentos que mas se recetan juntos
-#     masrecetados = masrecetados.astype('string')
-#     load.load(masrecetados,etl_conn, 'mas_recetados', False)
-#     # Hecho retrios
-#     hecho_retiros = extract.extract_retiros(co_sa,etl_conn)
-#     hecho_retiros = transform.transform_hecho_retiros(hecho_retiros,1)
-#     load.load(hecho_retiros, etl_conn, 'hecho_retiros', False)
-#     print('Done retiros fact')
 
-#     print('success all facts loaded')
-# else:
-#     print('done not new data')
+
+# PARA EL DATAMART DE RESELLER SALES 
+
+def runDimensionEmployee():
+    print("Inicio de extraccion de datos para Employee")
+    dimensionEmployee= extract.extraerDimensionEmployee(motorBaseDatos)
+    dimensionEmployeeTransformado = transform.transformarEmployee(dimensionEmployee)
+    load.cargarDimensionEmployee(dimensionEmployeeTransformado,motorBodegaDatos)
+
+def runDimensionReseller():
+    print("Inicio de extraccion de datos para Reseller")
+    dimensionReseller= extract.extraerDimensionReseller(motorBaseDatos)
+    dimensionResellerTransformado = transform.transformarReseller(dimensionReseller)
+    load.cargarDimensionReseller(dimensionResellerTransformado,motorBodegaDatos)
+
+def runHechoResellerSales():
+    print("Inicio de extraccion de datos para ResellerSales")
+    dimensionResellerSales= extract.extraerDatosHechoResellerSales(motorBaseDatos,motorBodegaDatos)
+    dimensionResellerSalesTransformado = transform.transformarHechoResellerSales(dimensionResellerSales)
+    load.cargarHechoResellerSales(dimensionResellerSalesTransformado,motorBodegaDatos)
+
+
+
+def main():
+    print("Inicio de extraccion de datos")
+    runDimensionCurrency()
+    runDimensionSalesTerritory()
+    runDimensionDate()
+    runDimensionPromotion()
+    runDimensionGeography()
+    runDimensionProductCategory()
+    runDimensionProductSubCategory()
+    runDimensionCustomer()
+    runDimensionProduct()
+    runHechoInternetSales()
+
+    # PARA LE DATAMART DE RESELLER SALES
+    runDimensionEmployee()
+    runDimensionReseller()
+    runHechoResellerSales()
+    print("Todos los procesos ETL completados con éxito")
+
+if __name__ == "__main__":
+    main()

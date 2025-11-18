@@ -1,12 +1,12 @@
 dimensiones completas:
-    currency 
-    Customer
-    Geography
-    ProductCategory
-    ProductSubCategory
-    Product (Falta columna [SizeRange], [DealerPrice], [Status].  Los puse en None)
-    promotion
-    SalesTerritory (Falta la columna de la [imagen]. La puse en None)
+    currency OK
+    Customer  OK (Falta columna [GeographyKey])
+    Geography  OK
+    ProductCategory  OK
+    ProductSubCategory  OK
+    Product OK (Falta columna [SizeRange], [DealerPrice].  Los puse en None)
+    promotion  OK
+    SalesTerritory  OK (Falta la columna de la [imagen]. La puse en None) 
 
 Tabla de hechos
-
+    InternetSales  OK (Falta [currencyKey])

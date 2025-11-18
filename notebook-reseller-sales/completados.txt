@@ -1,0 +1,8 @@
+Dimensiones completas
+
+    Employee  OK
+    Reseller OK (Falta la columna GeographyKey)
+
+
+Tabla echo completas    
+    

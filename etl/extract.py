@@ -690,45 +690,52 @@ def extraerDimensionReseller(conexion: Engine):
     return dimensionReseller
 
 def extraerDatosHechoResellerSales(conexion: Engine,conexionDW: Engine,):
-
-# Consulta SalesOrderDetail
-    queryOrderDetail = """
+    queryOderDetail = """
         SELECT 
-            [SalesOrderID],
-            [SalesOrderDetailID],
-            [CarrierTrackingNumber],
-            [OrderQty],
-            [ProductID],
-            [SpecialOfferID],
-            [UnitPrice],
-            [UnitPriceDiscount],
-            [LineTotal]
+        [SalesOrderID]
+            ,[SalesOrderDetailID]
+            ,[CarrierTrackingNumber]
+            ,[OrderQty]
+            ,[ProductID]
+            ,[SpecialOfferID]
+            ,[UnitPrice]
+            ,[UnitPriceDiscount]
+            ,[LineTotal]
         FROM Sales.SalesOrderDetail
     """
-    
-    tablaResultadoOrderDetail = pd.read_sql_query(queryOrderDetail, conexion)
-    
-    # Consulta SalesOrderHeader
-    queryOrderHeader = """
+
+    tablaResultadoOrderDetail = pd.read_sql_query(queryOderDetail, conexion)
+
+
+    queryOderHeader = """
         SELECT 
-            [SalesOrderID],
-            [RevisionNumber],
-            [OrderDate],
-            [DueDate],
-            [ShipDate],
-            [SalesOrderNumber],
-            [CustomerID],
-            [SalesPersonID],
-            [TerritoryID],
-            [TaxAmt],
-            [Freight],
-            [OnlineOrderFlag]
+        [SalesOrderID]
+            ,[RevisionNumber]
+            ,[OrderDate]
+            ,[DueDate]
+            ,[ShipDate]
+            ,[SalesOrderNumber]
+            ,[CustomerID]
+            ,[SalesPersonID]
+            ,[TerritoryID]
+            ,[TaxAmt]
+            ,[Freight]
+            ,[OnlineOrderFlag]
         FROM Sales.SalesOrderHeader
     """
-    
-    tablaResultadoOrderHeader = pd.read_sql_query(queryOrderHeader, conexion)
-    
-   
+
+    tablaResultadoOrderHeader = pd.read_sql_query(queryOderHeader, conexion)
+
+
+    queryProduct = """
+            SELECT 
+                [ProductID]
+                ,[StandardCost]
+            FROM Production.Product
+    """
+
+    tablaProduct = pd.read_sql_query(queryProduct, conexion)
+
 
     tablaCombinada = pd.merge(
         tablaResultadoOrderDetail,
@@ -737,12 +744,16 @@ def extraerDatosHechoResellerSales(conexion: Engine,conexionDW: Engine,):
         how='inner'
     )
 
-    # Condición Reseller Sales: onlineflag debe ser 0
+    # Condición reseller salies : onlineflag debe ser 0
     flag = tablaCombinada['OnlineOrderFlag'] == 0
 
     tablaResultado = tablaCombinada[
         flag
     ]
+
+
+    tablaResultado = tablaResultado.merge(tablaProduct, on='ProductID')
+
 
     print(f"Datos para Hecho Reseller Sales Extraidos")
     return tablaResultado

@@ -414,51 +414,50 @@ def transformarReseller(dimensionReseller: DataFrame) -> DataFrame:
 
 
 
-def transformarHechoResellerSales(tablaPurchaseSales:DataFrame) -> DataFrame:
+def transformarHechoResellerSales(tablaResultado:DataFrame) -> DataFrame:
+
+    tablaResultado.rename(columns={
+            'StandardCost': 'ProductStandardCost',
+            'TerritoryID': 'SalesTerritoryKey',
+            'UnitPriceDiscount': 'UnitPriceDiscountPct',
+            'SpecialOfferID': 'PromotionKey',
+            'OrderQty': 'OrderQuantity',
+            'LineTotal' : 'ExtendedAmount',
+            'ProductID' : 'ProductKey',
+            'DiscountPct' : 'UnitPriceDiscountPct',
+            'SalesPersonID' : 'EmployeeKey',
+            'PurchaseOrderNumber' : 'CustomerPONumber'
+        }, inplace=True)
+
+    tablaResultado["OrderDateKey"] = pd.to_datetime(tablaResultado["OrderDate"]).dt.strftime('%Y%m%d')
+    tablaResultado["DueDateKey"] = pd.to_datetime(tablaResultado["DueDate"]).dt.strftime('%Y%m%d')
+    tablaResultado["ShipDateKey"] = pd.to_datetime(tablaResultado["ShipDate"]).dt.strftime('%Y%m%d')
 
 
-    tablaPurchaseSales.rename(columns={
-        'StandardCost': 'ProductStandardCost',
-        'TerritoryID': 'SalesTerritoryKey',
-        'CustomerID': 'CustomerKey',
-        'UnitPriceDiscount': 'UnitPriceDiscountPct',
-        'SpecialOfferID': 'PromotionKey',
-        'OrderQty': 'OrderQuantity',
-        'LineTotal' : 'ExtendedAmount',
-        'EmployeeID' : 'EmployeeKey',
-        'ProductID' : 'ProductKey',
-        'DiscountPct' : 'UnitPriceDiscountPct'
-    }, inplace=True)
-
-    tablaPurchaseSales["OrderDateKey"] = pd.to_datetime(tablaPurchaseSales["OrderDate"]).dt.strftime('%Y%m%d')
-    tablaPurchaseSales["DueDateKey"] = pd.to_datetime(tablaPurchaseSales["DueDate"]).dt.strftime('%Y%m%d')
-    tablaPurchaseSales["ShipDateKey"] = pd.to_datetime(tablaPurchaseSales["ShipDate"]).dt.strftime('%Y%m%d')
-
-
-    tablaPurchaseSales["SalesAmount"] = tablaPurchaseSales["ExtendedAmount"] 
-    tablaPurchaseSales["CustomerPONumber"] = None
-    tablaPurchaseSales["ResellerKey"] = None
-    tablaPurchaseSales["CurrencyKey"] = None
-    tablaPurchaseSales["CarrierTrackingNumber"] = None
-    tablaPurchaseSales["CustomerPONumber"] = None
-    tablaPurchaseSales["SalesOrderLineNumber"] = None
-    tablaPurchaseSales["SalesOrderNumber"] = None
-    tablaPurchaseSales["SalesTerritoryKey"] = None
+    tablaResultado["SalesAmount"] = tablaResultado["ExtendedAmount"] 
+    tablaResultado["CustomerPONumber"] = None
+    tablaResultado["ResellerKey"] = None
+    tablaResultado["CurrencyKey"] = None
+    # tablaResultado["CarrierTrackingNumber"] = None
+    # tablaResultado["CustomerPONumber"] = None
+    tablaResultado["SalesOrderLineNumber"] = None
+    # tablaResultado["SalesOrderNumber"] = None
+    # tablaResultado["SalesTerritoryKey"] = None
 
 
 
-    tablaPurchaseSales["DiscountAmount"] = tablaPurchaseSales["UnitPrice"] *  tablaPurchaseSales["UnitPriceDiscountPct"] * tablaPurchaseSales["OrderQuantity"]
-    tablaPurchaseSales["TotalProductCost"] = tablaPurchaseSales["ProductStandardCost"] *  tablaPurchaseSales["OrderQuantity"]
+    tablaResultado["DiscountAmount"] = tablaResultado["UnitPrice"] *  tablaResultado["UnitPriceDiscountPct"] * tablaResultado["OrderQuantity"]
+    tablaResultado["TotalProductCost"] = tablaResultado["ProductStandardCost"] *  tablaResultado["OrderQuantity"]
 
 
-    tablaPurchaseSales.drop(columns=[
-        'PurchaseOrderDetailID',
-        'PurchaseOrderID'
-    ], inplace=True)
-
-
+    tablaResultado.drop(columns=[
+            'SalesOrderID',
+            'SalesOrderDetailID',
+            'OnlineOrderFlag',
+            'CustomerID'
+        ], inplace=True)
 
 
 
     print(f"Transformacion de Hecho Reseller Sales Completa")
-    return tablaPurchaseSales
+    return tablaResultado

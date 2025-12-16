@@ -438,11 +438,7 @@ def transformarHechoResellerSales(tablaResultado:DataFrame) -> DataFrame:
     tablaResultado["CustomerPONumber"] = None
     tablaResultado["ResellerKey"] = None
     tablaResultado["CurrencyKey"] = None
-    # tablaResultado["CarrierTrackingNumber"] = None
-    # tablaResultado["CustomerPONumber"] = None
     tablaResultado["SalesOrderLineNumber"] = None
-    # tablaResultado["SalesOrderNumber"] = None
-    # tablaResultado["SalesTerritoryKey"] = None
 
 
 

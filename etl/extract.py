@@ -199,7 +199,6 @@ def extraerDimensionProduct(conexion: Engine):
 
 
     
-
     queryProduct = """
     SELECT 
         [ProductID],
@@ -277,7 +276,7 @@ def extraerDimensionProduct(conexion: Engine):
     tablaProductProductPhoto = pd.read_sql_query(queryProductProductPhoto, conexion)
 
     description = tablaProductModelProductDescriptionCulture.merge(tablaProductDescription, on='ProductDescriptionID')
-
+    
     productPhoto = tablaProductProductPhoto.merge(tablaProductPhoto, on='ProductPhotoID')
     productPhoto.drop(columns=[
         'ProductPhotoID'
@@ -314,62 +313,78 @@ def extraerDimensionProduct(conexion: Engine):
     return dimensionProducto
 
 def extraerDatosHechoInternetSales(conexion: Engine):
-
-    queryOderDetail = """
-    SELECT 
-    [SalesOrderID]
-        ,[CarrierTrackingNumber]
-        ,[OrderQty]
-        ,[ProductID]
-        ,[SpecialOfferID]
-        ,[UnitPrice]
-        ,[UnitPriceDiscount]
-        ,[LineTotal]
-    FROM Sales.SalesOrderDetail
+    # Consulta SalesOrderDetail
+    queryOrderDetail = """
+        SELECT 
+            [SalesOrderID],
+            [SalesOrderDetailID],
+            [CarrierTrackingNumber],
+            [OrderQty],
+            [ProductID],
+            [SpecialOfferID],
+            [UnitPrice],
+            [UnitPriceDiscount],
+            [LineTotal]
+        FROM Sales.SalesOrderDetail
     """
-
-    tablaSalesOrderDetail = pd.read_sql_query(queryOderDetail, conexion)
-
-
-
-
-    queryOderHeader = """
-    SELECT 
-    [SalesOrderID]
-        ,[RevisionNumber]
-        ,[OrderDate]
-        ,[DueDate]
-        ,[ShipDate]
-        ,[SalesOrderNumber]
-        ,[CustomerID]
-        ,[SalesPersonID]
-        ,[TerritoryID]
-        ,[TaxAmt]
-        ,[Freight]
-    FROM Sales.SalesOrderHeader
+    
+    tablaResultadoOrderDetail = pd.read_sql_query(queryOrderDetail, conexion)
+    
+    # Consulta SalesOrderHeader
+    queryOrderHeader = """
+        SELECT 
+            [SalesOrderID],
+            [RevisionNumber],
+            [OrderDate],
+            [DueDate],
+            [ShipDate],
+            [SalesOrderNumber],
+            [CustomerID],
+            [SalesPersonID],
+            [TerritoryID],
+            [TaxAmt],
+            [Freight],
+            [OnlineOrderFlag]
+        FROM Sales.SalesOrderHeader
     """
-
-    tablaSalesOrderHeader = pd.read_sql_query(queryOderHeader, conexion)
-
-
-
+    
+    tablaResultadoOrderHeader = pd.read_sql_query(queryOrderHeader, conexion)
+    
+    # Consulta Product
     queryProduct = """
-    SELECT 
-    [ProductID]
-        ,[StandardCost]
-    FROM Production.Product
+        SELECT 
+            [ProductID],
+            [StandardCost]
+        FROM Production.Product
     """
-
+    
     tablaProduct = pd.read_sql_query(queryProduct, conexion)
+    
+    tablaCombinada = pd.merge(
+        tablaResultadoOrderDetail,
+        tablaResultadoOrderHeader,
+        on='SalesOrderID',
+        how='inner'
+    )
+
+    # Condición Internet Sales: onlineflag debe ser 1
+    flag = tablaCombinada['OnlineOrderFlag'] == 1
+
+    # Aplicar ambas condiciones (A AND B) usando el operador '&'
+    tablaResultado = tablaCombinada[
+        flag
+    ]
 
 
-    tablaSalesOrderDetail = tablaSalesOrderDetail.merge(tablaProduct, on='ProductID')
-    tablaSales = tablaSalesOrderDetail.merge(tablaSalesOrderHeader, on='SalesOrderID')
+    tablaResultado = tablaResultado.merge(tablaProduct, on='ProductID')
 
 
-    print(f"Datos para Hecho Internet Sales Extraidos")
 
-    return tablaSales
+
+    print("Datos para Hecho Internet Sales Extraídos")
+    
+    return tablaResultado
+
 
 
 # PARA EL DATAMART DE RESELLER SALES
@@ -676,83 +691,58 @@ def extraerDimensionReseller(conexion: Engine):
 
 def extraerDatosHechoResellerSales(conexion: Engine,conexionDW: Engine,):
 
-
-    queryPurchaseOderDetail = """
-    SELECT 
-    [PurchaseOrderID]
-        ,[PurchaseOrderDetailID]
-        ,[DueDate]
-        ,[OrderQty]
-        ,[ProductID]
-        ,[UnitPrice]
-        ,[LineTotal]
-    FROM Purchasing.PurchaseOrderDetail
+# Consulta SalesOrderDetail
+    queryOrderDetail = """
+        SELECT 
+            [SalesOrderID],
+            [SalesOrderDetailID],
+            [CarrierTrackingNumber],
+            [OrderQty],
+            [ProductID],
+            [SpecialOfferID],
+            [UnitPrice],
+            [UnitPriceDiscount],
+            [LineTotal]
+        FROM Sales.SalesOrderDetail
     """
-
-    tablaPurchaseOderDetail = pd.read_sql_query(queryPurchaseOderDetail, conexion)
-
-
-
-
-    queryPurchaseOderHeader = """
-    SELECT 
-    [PurchaseOrderID]
-        ,[RevisionNumber]
-        ,[EmployeeID]
-        ,[OrderDate]
-        ,[ShipDate]
-        ,[TaxAmt]
-        ,[Freight]
-    FROM Purchasing.PurchaseOrderHeader
+    
+    tablaResultadoOrderDetail = pd.read_sql_query(queryOrderDetail, conexion)
+    
+    # Consulta SalesOrderHeader
+    queryOrderHeader = """
+        SELECT 
+            [SalesOrderID],
+            [RevisionNumber],
+            [OrderDate],
+            [DueDate],
+            [ShipDate],
+            [SalesOrderNumber],
+            [CustomerID],
+            [SalesPersonID],
+            [TerritoryID],
+            [TaxAmt],
+            [Freight],
+            [OnlineOrderFlag]
+        FROM Sales.SalesOrderHeader
     """
+    
+    tablaResultadoOrderHeader = pd.read_sql_query(queryOrderHeader, conexion)
+    
+   
 
-    tablaPurchaseOderHeader = pd.read_sql_query(queryPurchaseOderHeader, conexion)
+    tablaCombinada = pd.merge(
+        tablaResultadoOrderDetail,
+        tablaResultadoOrderHeader,
+        on='SalesOrderID',
+        how='inner'
+    )
 
+    # Condición Reseller Sales: onlineflag debe ser 0
+    flag = tablaCombinada['OnlineOrderFlag'] == 0
 
-
-    queryProduct = """
-    SELECT 
-    [ProductKey]
-        ,[StandardCost]
-    FROM dbo.dimensionProduct
-    """
-
-    dimensionProduct = pd.read_sql_query(queryProduct, conexionDW)
-
-
-
-    queryPromotion = """
-    SELECT 
-    [PromotionKey]
-        ,[DiscountPct]
-    FROM dbo.dimensionPromotion
-    """
-
-    dimensionPromotion = pd.read_sql_query(queryPromotion, conexionDW)
-
-
-
-    querySpecialOfferProduct = """
-    SELECT 
-    [SpecialOfferID]
-        ,[ProductID]
-    FROM Sales.SpecialOfferProduct
-    """
-
-    tablaSpecialOfferProduct = pd.read_sql_query(querySpecialOfferProduct, conexion)
-
-
-    promotion = dimensionPromotion.merge(tablaSpecialOfferProduct, left_on='PromotionKey', right_on='SpecialOfferID')
-    promotion = promotion.merge(dimensionProduct,  left_on='ProductID', right_on='ProductKey')
-
-    promotion.drop(columns=[
-        'SpecialOfferID',
-        'ProductKey'
-    ], inplace=True)
-
-    tablaPurchaseSales = tablaPurchaseOderDetail.merge(tablaPurchaseOderHeader, on='PurchaseOrderID')
-    tablaPurchaseSales = tablaPurchaseSales.merge(promotion, on='ProductID')
-
+    tablaResultado = tablaCombinada[
+        flag
+    ]
 
     print(f"Datos para Hecho Reseller Sales Extraidos")
-    return tablaPurchaseSales
+    return tablaResultado

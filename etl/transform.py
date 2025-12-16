@@ -295,45 +295,45 @@ def transformarProduct(dimensionProducto: DataFrame) -> DataFrame:
 
 
 
-def transformarHechoInternetSales(tablaSales:DataFrame) -> DataFrame:
+def transformarHechoInternetSales(tablaResultado:DataFrame) -> DataFrame:
 
-
-    tablaSales.rename(columns={
+    tablaResultado.rename(columns={
         'TerritoryID': 'SalesTerritoryKey',
         'CustomerID': 'CustomerKey',
         'UnitPriceDiscount': 'UnitPriceDiscountPct',
         'SpecialOfferID': 'PromotionKey',
         'OrderQty': 'OrderQuantity',
-        'LineTotal' : 'ExtendedAmount',
-        'StandardCost' : 'ProductStandardCost',
-        'ProductID' : 'ProductKey'
+        'LineTotal': 'ExtendedAmount',
+        'StandardCost': 'ProductStandardCost',
+        'ProductID': 'ProductKey'
     }, inplace=True)
 
+    tablaResultado["DiscountAmount"] = tablaResultado["UnitPrice"] * tablaResultado["UnitPriceDiscountPct"] * tablaResultado["OrderQuantity"]
 
-    tablaSales["DiscountAmount"] = tablaSales["UnitPrice"] * tablaSales["UnitPriceDiscountPct"] * tablaSales["OrderQuantity"] 
+    tablaResultado["TotalProductCost"] = tablaResultado["ProductStandardCost"] * tablaResultado["OrderQuantity"]
 
-    tablaSales["TotalProductCost"] = tablaSales["ProductStandardCost"] * tablaSales["OrderQuantity"] 
+    tablaResultado["SalesAmount"] = tablaResultado["ExtendedAmount"]
 
-    tablaSales["SalesAmount"] = tablaSales["ExtendedAmount"]
+    tablaResultado["CustomerPONumber"] = None
+    tablaResultado["CurrencyKey"] = None
+    tablaResultado["SalesOrderLineNumber"] = None
 
-    tablaSales["CustomerPONumber"] = None
-    tablaSales["CurrencyKey"] = None
-    tablaSales["SalesOrderLineNumber"] = None
+    tablaResultado["OrderDateKey"] = pd.to_datetime(tablaResultado["OrderDate"]).dt.strftime('%Y%m%d')
+    tablaResultado["DueDateKey"] = pd.to_datetime(tablaResultado["DueDate"]).dt.strftime('%Y%m%d')
+    tablaResultado["ShipDateKey"] = pd.to_datetime(tablaResultado["ShipDate"]).dt.strftime('%Y%m%d')
 
-    tablaSales["OrderDateKey"] = pd.to_datetime(tablaSales["OrderDate"]).dt.strftime('%Y%m%d')
-    tablaSales["DueDateKey"] = pd.to_datetime(tablaSales["DueDate"]).dt.strftime('%Y%m%d')
-    tablaSales["ShipDateKey"] = pd.to_datetime(tablaSales["ShipDate"]).dt.strftime('%Y%m%d')
-
-    tablaSales.drop(columns=[
+    tablaResultado.drop(columns=[
         'SalesOrderID',
         'SalesPersonID',
+        'OnlineOrderFlag',
+        'SalesOrderDetailID'
     ], inplace=True)
 
 
     print(f"Transformacion de Hecho Internet Sales Completa")
 
 
-    return tablaSales
+    return tablaResultado
 
 
 

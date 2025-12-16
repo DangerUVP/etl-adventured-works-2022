@@ -142,21 +142,21 @@ def runHechoResellerSales():
 
 def main():
     print("Inicio de extraccion de datos")
-    runDimensionCurrency()
-    runDimensionSalesTerritory()
-    runDimensionDate()
-    runDimensionPromotion()
-    runDimensionGeography()
-    runDimensionProductCategory()
-    runDimensionProductSubCategory()
-    runDimensionCustomer()
-    runDimensionProduct()
+    # runDimensionCurrency()
+    # runDimensionSalesTerritory()
+    # runDimensionDate()
+    # runDimensionPromotion()
+    # runDimensionGeography()
+    # runDimensionProductCategory()
+    # runDimensionProductSubCategory()
+    # runDimensionCustomer()
+    # runDimensionProduct()
     runHechoInternetSales()
 
     # PARA LE DATAMART DE RESELLER SALES
-    runDimensionEmployee()
-    runDimensionReseller()
-    runHechoResellerSales()
+    # runDimensionEmployee()
+    # runDimensionReseller()
+    # runHechoResellerSales()
     print("Todos los procesos ETL completados con éxito")
 
 if __name__ == "__main__":

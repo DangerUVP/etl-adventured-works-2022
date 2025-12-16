@@ -1,5 +1,5 @@
 PASOS PARA LA EJECUCION EL ETL
-ACTUALIZAR PYTON: python -m pip install --upgrade pip
+
 PASO 1. INICIA ENTORNO VIRTUAL PYTHON py -m venv my_env
 
 PASO 2. PARA ACTIVAR EL ENTORNO .\my_env\Scripts\activate
